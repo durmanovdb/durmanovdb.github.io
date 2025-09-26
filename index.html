@@ -44,6 +44,7 @@
 				height: 85vh;
 				background-color: blue;
 				flex-shrink: 0;
+				clip-path: view-box;
 			}
 			
 			#map_image {
@@ -84,81 +85,104 @@
 				<img id="map_image" src="https://www.bsmfuture.co.uk/assets/img/image15.jpg" />
 			</div>
 			<div id="table_container">
-				
+				<iframe style="width:100%; height: 100%;" src="https://www.bsmfuture.co.uk/assets/img/image15.jpg"></iframe>
 			</div>
 		</div>
 		<script>
 const element = document.getElementById('map_image');
 
-// Состояния для зума
-let initialPinchDistance = null;
+// Состояние преобразования
 let currentScale = 1;
+let currentX = 0;
+let currentY = 0;
 
-// Состояния для панорамирования
-let isDragging = false;
-let startX = 0;
-let startY = 0;
-let offsetX = 0;
-let offsetY = 0;
+// Состояния жеста
+let initialPinchDistance = null;
+let initialX = 0;
+let initialY = 0; // Для панорамирования одним пальцем
+let initialMidX = 0;
+let initialMidY = 0; // Для коррекции зума
+
+// Установим transform-origin в (0, 0) для упрощения расчётов
+element.style.transformOrigin = '0 0';
 
 element.addEventListener('touchstart', (e) => {
-    // Предотвращаем стандартное поведение браузера
     e.preventDefault();
 
-    // Логика для ПАНОРАМИРОВАНИЯ (1 палец)
     if (e.touches.length === 1) {
-        isDragging = true;
-        startX = e.touches[0].clientX - offsetX;
-        startY = e.touches[0].clientY - offsetY;
+        // Панорамирование: фиксируем начальную позицию касания относительно текущего смещения
+        initialX = e.touches[0].clientX - currentX;
+        initialY = e.touches[0].clientY - currentY;
         
-    // Логика для ЗУМА (2 пальца)
     } else if (e.touches.length === 2) {
-        isDragging = false; // Отключаем панорамирование, если начался зум
+        
+        // 1. Вычисляем начальное расстояние между пальцами
         const dx = e.touches[0].clientX - e.touches[1].clientX;
         const dy = e.touches[0].clientY - e.touches[1].clientY;
         initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+
+        // 2. Вычисляем начальный центр жеста (середина между пальцами)
+        initialMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        initialMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
     }
 });
 
 element.addEventListener('touchmove', (e) => {
-    // Предотвращаем стандартное поведение браузера
     e.preventDefault();
-    
-    // Движение (ПАНОРАМИРОВАНИЕ)
-    if (isDragging && e.touches.length === 1) {
-        offsetX = e.touches[0].clientX - startX;
-        offsetY = e.touches[0].clientY - startY;
-        element.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${currentScale})`;
-    } 
-    
-    // Зум (щипок)
-    else if (e.touches.length === 2 && initialPinchDistance !== null) {
+
+    if (e.touches.length === 1) {
+        // Логика панорамирования (1 палец):
+        currentX = e.touches[0].clientX - initialX;
+        currentY = e.touches[0].clientY - initialY;
+
+        element.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+
+    } else if (e.touches.length === 2 && initialPinchDistance !== null) {
+        
+        // 1. Текущее расстояние и новый масштаб (newScale)
         const dx = e.touches[0].clientX - e.touches[1].clientX;
         const dy = e.touches[0].clientY - e.touches[1].clientY;
         const newDistance = Math.sqrt(dx * dx + dy * dy);
         
         const scaleFactor = newDistance / initialPinchDistance;
-        
-        // Обновляем текущий масштаб
         const newScale = scaleFactor * currentScale;
 
-        // Применяем зум и панорамирование вместе
-        element.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${newScale})`;
+        // 2. Текущий центр жеста (Midpoint)
+        const currentMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const currentMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+        // 3. Расчёт разницы в смещении
+        // (Только эта часть решает проблему "прыжка"!)
+        // Считаем, насколько сдвинулся центр жеста, и корректируем translate.
+        const deltaX = currentMidX - initialMidX;
+        const deltaY = currentMidY - initialMidY;
+
+        // 4. Компенсация смещения
+        // Мы используем разницу между старым и новым масштабом для коррекции
+        const newOffsetX = currentX + deltaX - (initialMidX - currentX) * (scaleFactor - 1);
+        const newOffsetY = currentY + deltaY - (initialMidY - currentY) * (scaleFactor - 1);
+
+        element.style.transform = `translate(${newOffsetX}px, ${newOffsetY}px) scale(${newScale})`;
     }
 });
 
 element.addEventListener('touchend', (e) => {
-    isDragging = false;
-    
-    // Если жест "щипка" закончился
+    // 1. Если зум завершён, фиксируем новый масштаб и позицию.
     if (initialPinchDistance !== null) {
-        // Получаем финальное значение scale из CSS и обновляем currentScale
         const finalTransform = window.getComputedStyle(element).transform;
         const matrix = new DOMMatrix(finalTransform);
-        currentScale = matrix.a; // "a" — это компонент scaleX в матрице преобразования
         
-        initialPinchDistance = null; // Сбрасываем для следующего зума
+        currentScale = matrix.a; // Финальный масштаб
+        currentX = matrix.e;     // Финальное смещение X
+        currentY = matrix.f;     // Финальное смещение Y
+        
+        initialPinchDistance = null; // Сброс для следующего жеста
     }
+    
+    // Если панорамирование завершено, текущие X/Y уже зафиксированы
+    // в touchmove, так что просто сбрасываем начальные точки.
+    initialX = 0;
+    initialY = 0;
 });
 		</script>
 	</body>
