@@ -178,12 +178,19 @@
 						currentY = matrix.f;     // Финальное смещение Y
 						
 						initialPinchDistance = null; // Сброс для следующего жеста
+						
+						
 					}
 					
-					// Если панорамирование завершено, текущие X/Y уже зафиксированы
-					// в touchmove, так что просто сбрасываем начальные точки.
-					//initialX = 0;
-					//initialY = 0;
+					if (e.touches.length === 1) {
+						initialX = initialMidX;
+						initialY = initialMidY;
+					} else {
+						// Если панорамирование завершено, текущие X/Y уже зафиксированы
+						// в touchmove, так что просто сбрасываем начальные точки.
+						initialX = 0;
+						initialY = 0;
+					}
 				});
 			}
 			
