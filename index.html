@@ -183,8 +183,8 @@
 					}
 					
 					if (e.touches.length === 1) {
-						initialX = initialMidX;
-						initialY = initialMidY;
+						initialX = e.touches[0].clientX - currentX;
+						initialY = e.touches[0].clientY - currentY;
 					} else {
 						// Если панорамирование завершено, текущие X/Y уже зафиксированы
 						// в touchmove, так что просто сбрасываем начальные точки.
