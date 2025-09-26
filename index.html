@@ -44,11 +44,17 @@
 				height: 85vh;
 				background-color: blue;
 				flex-shrink: 0;
-				clip-path: view-box;
+				/* clip-path: view-box; */
+				overflow: hidden;
+			}
+			
+			#map {
+				background-color: red;
 			}
 			
 			#map_image {
-				background-color: red;
+				max-width: 100%;
+				max-height: 100%;
 			}
 			
 			#table_container {
@@ -82,15 +88,20 @@
 		</div>
 		<div id="main_container">
 			<div id="map_container">
-				<img id="map_image" src="https://www.bsmfuture.co.uk/assets/img/image15.jpg" />
+				<div id="map">
+					<img id="map_image" src="https://www.bsmfuture.co.uk/assets/img/image15.jpg" />
+				</div>
 			</div>
 			<div id="table_container">
-				<iframe style="width:100%; height: 100%;" src="https://www.bsmfuture.co.uk/assets/img/image15.jpg"></iframe>
+				sex
 			</div>
 		</div>
 		<script>
 			function mapPinchInit() {
-				const element = document.getElementById('map_image');
+				//далее говнокод джемини с крошечной правкой...
+				
+				const element = document.getElementById('map_container');
+				const MAPPP_element = document.getElementById('map');
 
 				// Состояние преобразования
 				let currentScale = 1;
@@ -136,7 +147,7 @@
 						currentX = e.touches[0].clientX - initialX;
 						currentY = e.touches[0].clientY - initialY;
 
-						element.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+						MAPPP_element.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
 
 					} else if (e.touches.length === 2 && initialPinchDistance !== null) {
 						
@@ -163,14 +174,14 @@
 						const newOffsetX = currentX + deltaX - (initialMidX - currentX) * (scaleFactor - 1);
 						const newOffsetY = currentY + deltaY - (initialMidY - currentY) * (scaleFactor - 1);
 
-						element.style.transform = `translate(${newOffsetX}px, ${newOffsetY}px) scale(${newScale})`;
+						MAPPP_element.style.transform = `translate(${newOffsetX}px, ${newOffsetY}px) scale(${newScale})`;
 					}
 				});
 
 				element.addEventListener('touchend', (e) => {
 					// 1. Если зум завершён, фиксируем новый масштаб и позицию.
 					if (initialPinchDistance !== null) {
-						const finalTransform = window.getComputedStyle(element).transform;
+						const finalTransform = window.getComputedStyle(MAPPP_element).transform;
 						const matrix = new DOMMatrix(finalTransform);
 						
 						currentScale = matrix.a; // Финальный масштаб
@@ -182,7 +193,7 @@
 						
 					}
 					
-					if (e.touches.length === 1) {
+					if (e.touches.length === 1) { // ебучее исправление ебучего дергания при отпускании одного ебучего пальца!!!
 						initialX = e.touches[0].clientX - currentX;
 						initialY = e.touches[0].clientY - currentY;
 					} else {
