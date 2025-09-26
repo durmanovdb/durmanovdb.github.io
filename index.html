@@ -1,0 +1,102 @@
+<html>
+	<head>
+		<style>
+			* {
+				padding: 0;
+				margin: 0;
+			}
+			
+			#main_container {
+				width: 100vw;
+				height: 90vh;
+				background-color: #000;
+				overflow-x: scroll;
+				overflow-y: hidden;
+				display: flex;
+			}
+			
+			/* 1. Стилизация самого скроллбара */
+			#main_container::-webkit-scrollbar {
+				/* На мобильных устройствах с оверлейными скроллбарами 
+				   эта высота может быть проигнорирована, но на десктопе сработает. */
+				height: 5vh; 
+			}
+
+			/* 2. Стилизация дорожки (фона) */
+			#main_container::-webkit-scrollbar-track {
+				background: #222;
+			}
+
+			/* 3. Стилизация ползунка (движущейся части) */
+			#main_container::-webkit-scrollbar-thumb {
+				background: #aaa; 
+			}
+
+			/* 4. Изменение цвета ползунка при наведении */
+			#main_container::-webkit-scrollbar-thumb:hover {
+				background: #ccc; 
+			}
+			
+			
+			#map_container {
+				width: 100vw;
+				height: 85vh;
+				background-color: blue;
+				flex-shrink: 0;
+			}
+			
+			#map_image {
+				background-color: red;
+			}
+			
+			#table_container {
+				min-width: 100vw;
+				height: 85vh;
+				background-color: green;
+				flex-shrink: 0;
+			}
+			
+			#menu_container {
+				width: 100vw;
+				height: 10vh;
+				background-color: yellow;
+				overflow: hidden;
+				display: flex;
+			}
+			
+			#menu_container .button {
+				width: 8vh;
+				height: 8vh;
+				margin: 1vh;
+				background-color: red;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div id="menu_container">
+			<button class="button">
+			</button>
+		</div>
+		<div id="main_container">
+			<div id="map_container">
+				<img id="map_image" src="https://www.bsmfuture.co.uk/assets/img/image15.jpg" />
+			</div>
+			<div id="table_container">
+				
+			</div>
+		</div>
+		<script>
+			const image = document.getElementById('map_image');
+			let currentScale = 1;
+			
+			image.addEventListener('pinch', (event) => {
+				image.style.transform = `scale(${event.scale * currentScale})`;
+			});
+
+			image.addEventListener('pinchend', (event) => {
+				currentScale *= event.scale;
+			});
+		</script>
+	</body>
+</html>
