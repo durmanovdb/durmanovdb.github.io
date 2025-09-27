@@ -80,6 +80,7 @@
 			}
 			
 		</style>
+		<script src="https://unpkg.com/@panzoom/panzoom@4.6.0/dist/panzoom.min.js"></script>
 	</head>
 	<body>
 		<div id="menu_container">
@@ -97,6 +98,12 @@
 			</div>
 		</div>
 		<script>
+			const my_panzoom = Panzoom(
+				document.getElementById('map'),
+				{
+				maxScale: 5
+			})
+		
 			function mapPinchInit() {
 				//далее говнокод джемини с крошечной правкой...
 				
@@ -205,7 +212,7 @@
 				});
 			}
 			
-			mapPinchInit();
+			//mapPinchInit();
 		</script>
 	</body>
 </html>
