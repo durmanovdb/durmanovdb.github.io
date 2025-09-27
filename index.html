@@ -86,7 +86,6 @@
 			
 		</style>
 		<script src="https://unpkg.com/@panzoom/panzoom@4.6.0/dist/panzoom.min.js"></script>
-		<script src="https://unpkg.com/pinch-zoom-js@2.3.5/dist/pinch-zoom.min.js"></script>
 	</head>
 	<body>
 		<div id="menu_container">
@@ -106,6 +105,8 @@
 			</div>
 		</div>
 		<script>
+			
+		
 			const my_panzoom = Panzoom(
 				document.getElementById('map'),
 				{
@@ -113,12 +114,17 @@
 				}
 			)
 			
-			let my_pinchzoom = new PinchZoom(
-				document.getElementById('sex'),
-				{
-					maxZoom: 5
-				}
-			);
+			async function SEX_ZALOOPA() {
+				const PinchZoom = (await import("https://unpkg.com/pinch-zoom-js@2.3.5/dist/pinch-zoom.min.js")).default;
+				let my_pinchzoom = new PinchZoom(
+					document.getElementById('sex'),
+					{
+						maxZoom: 5
+					}
+				);
+			};
+			SEX_ZALOOPA();
+			
 		
 			function mapPinchInit() {
 				//далее говнокод джемини с крошечной правкой...
