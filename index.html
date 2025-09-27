@@ -57,6 +57,11 @@
 				max-height: 100%;
 			}
 			
+			#kex {
+				max-width: 100%;
+				max-height: 100%;
+			}
+			
 			#table_container {
 				min-width: 100vw;
 				height: 85vh;
@@ -81,6 +86,7 @@
 			
 		</style>
 		<script src="https://unpkg.com/@panzoom/panzoom@4.6.0/dist/panzoom.min.js"></script>
+		<script src="https://unpkg.com/pinch-zoom-js@2.3.5/dist/pinch-zoom.min.js"></script>
 	</head>
 	<body>
 		<div id="menu_container">
@@ -94,15 +100,25 @@
 				</div>
 			</div>
 			<div id="table_container">
-				sex
+				<div id="sex">
+					<img id="kex" src="https://www.bsmfuture.co.uk/assets/img/image15.jpg" />
+				</div>
 			</div>
 		</div>
 		<script>
 			const my_panzoom = Panzoom(
 				document.getElementById('map'),
 				{
-				maxScale: 5
-			})
+					maxScale: 5
+				}
+			)
+			
+			let my_pinchzoom = new PinchZoom(
+				document.getElementById('sex'),
+				{
+					maxZoom: 5
+				}
+			);
 		
 			function mapPinchInit() {
 				//далее говнокод джемини с крошечной правкой...
